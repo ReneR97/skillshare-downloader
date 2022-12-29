@@ -42,7 +42,7 @@ The above command only needs to be executed once.
 After that, execute the following command to start the script: 
 
 ```bash
-  "npm run start". 
+  npm run start 
 ```
 
 All the courses will be downloaded in a folder called "skillshare_courses/{coursename}".
