@@ -32,6 +32,17 @@ In the  window popup, look for "PHPSESSID", click to open it and copy the conten
 
 Do the same with "skillshare_user_".
 
-After you have done that, just open a terminal and start the script with "npm run start". 
+After you have done that, just open a terminal and execute the following command:
+
+```bash
+  npm i
+```
+
+The above command only needs to be executed once.
+After that, execute the following command to start the script: 
+
+```bash
+  "npm run start". 
+```
 
 All the courses will be downloaded in a folder called "skillshare_courses/{coursename}".
