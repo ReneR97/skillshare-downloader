@@ -16,10 +16,23 @@ async function scrapeVideos() {
         fs.mkdirSync(dir, { recursive: true });
     }
 
-    let maxItems = classData['_embedded']['sessions']['_embedded']['sessions'].length;
     let downloaded = 0;
+    let maxItems = classData['_embedded']['sessions']['_embedded']['sessions'].length;
 
-    classData['_embedded']['sessions']['_embedded']['sessions'].forEach((session) => {
+    classData['_embedded']['sessions']['_embedded']['sessions'].forEach(async (session) => {
+        let dl = await download(session, dir);
+
+        if (dl) {
+            downloaded++;
+            console.log(`Download ${downloaded}/${maxItems} Completed!`);
+        } else {
+            console.log('COOKIE ERROR');
+        }
+    });
+}
+
+function download(session, dir) {
+    return new Promise((resolve, reject) => {
         req = https.request(
             {
                 method: 'GET',
@@ -42,11 +55,10 @@ async function scrapeVideos() {
 
                     writeStream.on('finish', () => {
                         writeStream.close();
-                        downloaded++;
-                        console.log(`Download ${downloaded}/${maxItems} Completed!`);
+                        resolve(true);
                     });
                 } else {
-                    console.log('COOKIE ERROR');
+                    reject(false);
                 }
             },
         );
