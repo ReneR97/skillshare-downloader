@@ -15,6 +15,7 @@ You will find the following variables:
   let classID = '';
   let phpsessid = '';
   let skillshare_user_ = '';
+  let subtitles = '';
 ```
     
 The classID is found in the url of the course you want to downloaded. 
@@ -31,6 +32,9 @@ After you installed the extension, log into skillshare and open the extension.
 In the  window popup, look for "PHPSESSID", click to open it and copy the contents of the Value field into the variable. 
 
 Do the same with "skillshare_user_".
+
+If you want to also download subtitles, just add your preferred language in the subtitles variable. (en for englisch, de for german, etc...).
+Be sure that the course supports the subtitles language that you want to download.
 
 After you have done that, just open a terminal and execute the following command:
 
