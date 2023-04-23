@@ -6,9 +6,11 @@
     "scripts": {
         "start": "node index.js"
     },
+    "type": "module",
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "cloudflare-scraper": "^2.0.0",
         "follow-redirects": "^1.15.2",
         "node-fetch": "^2.6.7"
     }
