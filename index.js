@@ -31,7 +31,7 @@ async function scrapeVideos() {
 
             if (subtitles != '') {
                 let video_hashed_id;
-                if (i == 0) video_hashed_id = session['video_hashed_id'].replace('bc:', '');
+                if (session['video_hashed_id'] != null && session['video_hashed_id'] != '') video_hashed_id = session['video_hashed_id'].replace('bc:', '');
                 else video_hashed_id = /thumbnails\/(.*)\//gm.exec(session['image_thumbnail'])[1];
 
                 let subtitles_data = await fetchSubtitlesInfo(`https://edge.api.brightcove.com/playback/v1/accounts/3695997568001/videos/${video_hashed_id}`);
@@ -105,8 +105,15 @@ function download(session, dir) {
 
 async function fetchFromApi(apiURL) {
     const response = await fetch(apiURL, {
-        method: 'get',
+        method: 'GET',
+        hostname: 'api.skillshare.com',
+        path: apiURL.replace('https://api.skillshare.com/', ''),
         headers: {
+            Cookie: `PHPSESSID=${phpsessid}; skillshare_user_=${skillshare_user_}`,
+            'User-Agent': 'Skillshare/5.3.0; Android 9.0.1',
+            Accept: 'application/vnd.skillshare.class+json;,version=0.8',
+            Host: 'api.skillshare.com',
+            Referer: 'https://www.skillshare.com/',
             'Content-Type': 'application/json',
         },
     });
