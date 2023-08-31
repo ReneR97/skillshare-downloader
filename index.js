@@ -8,7 +8,9 @@ let skillshare_user_ = '';
 
 let subtitles = ''; //en, de, pt...
 
-scrapeVideos();
+(async () => {
+    await scrapeVideos();
+})();
 
 async function scrapeVideos() {
     let classData = await fetchFromApi(`https://api.skillshare.com/classes/${classID}`);
@@ -22,40 +24,51 @@ async function scrapeVideos() {
     let downloaded = 0;
     let maxItems = classData['_embedded']['sessions']['_embedded']['sessions'].length;
 
-    classData['_embedded']['sessions']['_embedded']['sessions'].forEach(async (session, i) => {
+    for (let i = 0; i < maxItems; i++) {
+        let session = classData['_embedded']['sessions']['_embedded']['sessions'][i];
         let dl = await download(session, dir);
 
         if (dl) {
             downloaded++;
             console.log(`Download ${downloaded}/${maxItems} Completed!`);
 
-            if (subtitles != '') {
+            if (subtitles !== '') {
                 let video_hashed_id;
-                if (session['video_hashed_id'] != null && session['video_hashed_id'] != '') video_hashed_id = session['video_hashed_id'].replace('bc:', '');
-                else video_hashed_id = /thumbnails\/(.*)\//gm.exec(session['image_thumbnail'])[1];
+                if (session['video_hashed_id'] != null && session['video_hashed_id'] !== '') {
+                    video_hashed_id = session['video_hashed_id'].replace('bc:', '');
+                } else {
+                    video_hashed_id = /thumbnails\/(.*)\//gm.exec(session['image_thumbnail'])[1];
+                }
 
                 let subtitles_data = await fetchSubtitlesInfo(`https://edge.api.brightcove.com/playback/v1/accounts/3695997568001/videos/${video_hashed_id}`);
-
-                if (subtitles_data['error_code']) console.log('There was an error getting the subtitles data. ERROR: ' + subtitles_data);
-                else {
+                console.log(`https://edge.api.brightcove.com/playback/v1/accounts/3695997568001/videos/${video_hashed_id}`);
+                if (subtitles_data[0]['error_code']) {
+                    //console.log('There was an error getting the subtitles data. ERROR: ' + subtitles_data[0]['message']);
+                } else {
                     let subtitles_url = '';
 
                     subtitles_data['text_tracks'].forEach((el) => {
-                        if (el['srclang'].includes(subtitles)) subtitles_url = el['src'];
+                        if (el['srclang'].includes(subtitles)) {
+                            subtitles_url = el['src'];
+                        }
                     });
 
-                    if (subtitles_url == '') console.log("Couldn't find subtitles for specified language");
-                    else {
+                    if (subtitles_url === '') {
+                        console.log("Couldn't find subtitles for specified language");
+                    } else {
                         let dl = await downloadSubtitles(subtitles_url, dir, session);
-                        if (dl) console.log(`Download Subtitles ${downloaded}/${maxItems} Completed!`);
-                        else console.log('There was an Error when downloading the Subtitles');
+                        if (dl) {
+                            console.log(`Download Subtitles ${downloaded}/${maxItems} Completed!`);
+                        } else {
+                            console.log('There was an Error when downloading the Subtitles');
+                        }
                     }
                 }
             }
         } else {
             console.log('COOKIE ERROR');
         }
-    });
+    }
 }
 
 async function downloadSubtitles(url, dir, session) {
@@ -86,7 +99,6 @@ function download(session, dir) {
                 if (!res.responseUrl.includes('api.skillshare.com')) {
                     const path = `${dir}${session['index']}_${convertToValidFilename(session['_links']['download']['title'])}.mp4`;
                     const writeStream = fs.createWriteStream(path);
-
                     res.pipe(writeStream);
 
                     writeStream.on('finish', () => {
